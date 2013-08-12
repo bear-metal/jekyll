@@ -38,10 +38,10 @@ module Jekyll
 
       self.categories = dir.split('/').reject { |x| x.empty? }
       self.process(name)
-      begin 
+      begin
         self.read_yaml(@base, name)
       rescue Exception => msg
-        raise FatalException.new("#{msg} in #{@base}/#{name}")        
+        raise FatalException.new("#{msg} in #{@base}/#{name}")
       end
 
       #If we've added a date and time to the yaml, use that instead of the filename date
@@ -194,14 +194,15 @@ module Jekyll
 
       do_layout(payload, layouts)
     end
-    
+
     # Obtain destination path.
     #   +dest+ is the String path to the destination dir
     #
     # Returns destination file path.
     def destination(dest)
       # The url needs to be unescaped in order to preserve the correct filename
-      path = File.join(dest, CGI.unescape(self.url))
+      path = blog_root.empty? ? dest : File.join(dest, blog_root)
+      path = File.join(path, CGI.unescape(self.url))
       path = File.join(path, "index.html") if template[/\.html$/].nil?
       path
     end
@@ -255,6 +256,12 @@ module Jekyll
       else
         nil
       end
+    end
+
+    private
+
+    def blog_root
+      site.config['blog_root'].to_s
     end
   end
 
